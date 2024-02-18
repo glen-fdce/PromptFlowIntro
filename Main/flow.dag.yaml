@@ -1,0 +1,118 @@
+inputs:
+  question:
+    type: string
+    default: Do we have any anything that we need to archieve by 2030 according to
+      our environmental policy?
+  deployment:
+    type: string
+    default: gpt-35-turbo
+  chatHistory:
+    type: list
+    description: '[{"inputs":{"question":"Do we have an environmental
+      policy?"},"outputs":{"answer":"Yes, we do."}}]'
+    default: []
+  maxResponseTokens:
+    type: int
+    default: 1024
+    description: ""
+  useEmbeddings:
+    type: bool
+    default: true
+  indexName:
+    type: string
+    default: adventureworks-hr-index
+  maxChunks:
+    type: int
+    default: 0
+  modelName:
+    type: string
+    default: gpt-35-turbo
+  startingMessage:
+    type: string
+    default: Hey there! How can I help you?
+outputs:
+  answer:
+    type: string
+    reference: ${LLM_FinalOutput.output}
+  context:
+    type: string
+    reference: ${Python_BuildRAG.output}
+  intent:
+    type: string
+    reference: ${LLM_Intent.output}
+nodes:
+- name: LLM_Intent
+  type: llm
+  source:
+    type: code
+    path: LLM_Intent.jinja2
+  inputs:
+    deployment_name: gpt-35-turbo
+    chat_history: ${inputs.chatHistory}
+    question: ${inputs.question}
+  connection: aoai-fdce
+  api: chat
+- name: Embedding_Intent
+  type: python
+  source:
+    type: package
+    tool: promptflow.tools.embedding.embedding
+  inputs:
+    connection: aoai-fdce
+    input: ${LLM_Intent.output}
+    deployment_name: text-embedding-ada-002
+  activate:
+    when: ${inputs.useEmbeddings}
+    is: true
+- name: Python_SearchAIS
+  type: python
+  source:
+    type: code
+    path: Python_SearchAIS.py
+  inputs:
+    ais: ais-fdce
+    indexName: ${inputs.indexName}
+    searchQueryText: ${LLM_Intent.output}
+    maxResults: ${inputs.maxChunks}
+    searchQueryEmbeddings: ${Embedding_Intent.output}
+- name: Python_GetDate
+  type: python
+  source:
+    type: code
+    path: Python_GetDate.py
+  inputs: {}
+- name: Prompt_RagSystemMsgInitial
+  type: prompt
+  source:
+    type: code
+    path: Prompt_RagSystemMsgInitial.jinja2
+  inputs:
+    Date: ${Python_GetDate.output}
+- name: Python_BuildRAG
+  type: python
+  source:
+    type: code
+    path: Python_BuildRAG.py
+  inputs:
+    modelName: ${inputs.modelName}
+    maxOutputTokens: ${inputs.maxResponseTokens}
+    startingMessage: ${inputs.startingMessage}
+    ragSystemMsg: ${Prompt_RagSystemMsgInitial.output}
+    ragChatHistory: ${inputs.chatHistory}
+    question: ${inputs.question}
+    results: ${Python_SearchAIS.output}
+- name: LLM_FinalOutput
+  type: llm
+  source:
+    type: code
+    path: LLM_FinalOutput.jinja2
+  inputs:
+    deployment_name: gpt-35-turbo
+    max_tokens: ${inputs.maxResponseTokens}
+    rag_system_msg_initial: ${Prompt_RagSystemMsgInitial.output}
+    snippets: ${Python_BuildRAG.output}
+    starting_message: ${inputs.startingMessage}
+    chat_history: ${inputs.chatHistory}
+    question: ${inputs.question}
+  connection: aoai-fdce
+  api: chat

@@ -1,0 +1,17 @@
+system:
+{{rag_system_msg_initial}}
+{{snippets}}
+
+{% if starting_message %}
+assistant:
+{{starting_message}}
+{% endif %}
+{% for item in chat_history %}
+user:
+{{item.inputs.question}}
+assistant:
+{{item.outputs.answer}}
+{% endfor %}
+
+user:
+{{question}}

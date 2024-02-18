@@ -1,0 +1,6 @@
+﻿question,deployment,chatHistory,maxResponseTokens,useEmbeddings,indexName,maxChunks,modelName,startingMessage
+Do we have any anything that we need to archieve by 2030 according to our environmental policy?,gpt-35-turbo,[],1024,TRUE,adventureworks-hr-index,0,gpt-35-turbo,Hey there! How can I help you?
+Tell me a little our anti bribary policy.,gpt-35-turbo,[],1024,TRUE,adventureworks-hr-index,0,gpt-35-turbo,Hey there! How can I help you?
+"Thanks, do they have a phone number too?",gpt-35-turbo,"[{""inputs"":{""question"":""What is the email address of our Cape Town office?""},""outputs"":{""answer"":""The email address of the AdventureWorks Cape Town office is capetown@adventureworks.com.""}}]",1024,TRUE,adventureworks-hr-index,0,gpt-35-turbo,Hey there! How can I help you?
+"According to our Employee Handbook, do we have a dress code?",gpt-35-turbo,[],1024,TRUE,adventureworks-hr-index,0,gpt-35-turbo,Hey there! How can I help you?
+"What is our company slogan??",gpt-35-turbo,[],1024,TRUE,adventureworks-hr-index,0,gpt-35-turbo,Hey there! How can I help you?

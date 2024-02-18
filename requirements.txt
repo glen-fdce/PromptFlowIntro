@@ -1,0 +1,7 @@
+promptflow==1.4.0
+promptflow-tools
+azure-search-documents
+azure-core
+tiktoken
+xlsxwriter
+keyrings.alt
